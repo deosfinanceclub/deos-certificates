@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certificate Verification — DEOS Finance Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0D1B3E;
+      --navy-mid:  #162040;
+      --navy-card: #1A2850;
+      --purple:    #6B21A8;
+      --purple-lt: #9333EA;
+      --pink:      #DB2777;
+      --pink-lt:   #F472B6;
+      --gold:      #F59E0B;
+      --green:     #10B981;
+      --red:       #EF4444;
+      --text:      #E2E8F0;
+      --muted:     #94A3B8;
+      --border:    rgba(107,33,168,0.35);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    header {
+      width: 100%;
+      padding: 2rem 1rem 1.5rem;
+      text-align: center;
+      background: linear-gradient(135deg, var(--navy) 0%, #1e0a3c 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 0.9rem;
+    }
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    header h1 span {
+      background: linear-gradient(90deg, var(--purple-lt), var(--pink-lt));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    /* ── Main card ───────────────────────────────────────── */
+    main {
+      width: 100%;
+      max-width: 600px;
+      padding: 2.5rem 1.25rem;
+    }
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      box-shadow: 0 8px 40px rgba(107,33,168,0.15);
+    }
+
+    /* ── Search ──────────────────────────────────────────── */
+    .search-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--purple-lt);
+      margin-bottom: 0.6rem;
+    }
+    .search-row {
+      display: flex;
+      gap: 0.6rem;
+    }
+    .search-row input {
+      flex: 1;
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 0.6rem;
+      color: #fff;
+      font-size: 1rem;
+      font-family: 'Inter', monospace;
+      padding: 0.7rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-row input:focus { border-color: var(--purple-lt); }
+    .search-row input::placeholder { color: var(--muted); }
+    .btn {
+      background: linear-gradient(135deg, var(--purple), var(--pink));
+      color: #fff;
+      border: none;
+      border-radius: 0.6rem;
+      padding: 0.7rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+
+    /* ── Result ──────────────────────────────────────────── */
+    #result { margin-top: 1.8rem; display: none; }
+    .result-box {
+      border-radius: 1rem;
+      padding: 1.6rem;
+      border: 1px solid transparent;
+    }
+    .result-box.valid {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.35);
+    }
+    .result-box.invalid {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.35);
+    }
+    .result-icon {
+      font-size: 2.6rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      text-align: center;
+    }
+    .result-status {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .result-status.valid  { color: var(--green); }
+    .result-status.invalid { color: var(--red); }
+    .detail-grid {
+      display: grid;
+      gap: 0.6rem;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .detail-label { color: var(--muted); font-weight: 500; }
+    .detail-value { color: #fff; font-weight: 600; text-align: right; max-width: 60%; }
+    .cert-id-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(107,33,168,0.3), rgba(219,39,119,0.3));
+      border: 1px solid var(--border);
+      border-radius: 0.4rem;
+      padding: 0.2rem 0.6rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--pink-lt);
+    }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 1.2rem;
+      line-height: 1.6;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    footer {
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-badge">DEOS Finance Club</div>
+    <h1>Certificate <span>Verification</span></h1>
+    <p>Investing Academy &mdash; Season 1</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <label class="search-label" for="cert-input">Enter Certificate ID</label>
+      <div class="search-row">
+        <input id="cert-input" type="text" placeholder="e.g. DEOS-IA-S1-001"
+               autocomplete="off" autocapitalize="characters" spellcheck="false"/>
+        <button class="btn" onclick="verify()">Verify</button>
+      </div>
+
+      <div id="result"></div>
+
+      <p class="hint">
+        Scan a QR code from a certificate, or enter the Certificate ID manually.<br/>
+        This page verifies completion of the <strong>DEOS Finance Club Investing Academy</strong>.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    Registry last updated: May 22, 2026 at 22:50 &nbsp;|&nbsp; DEOS Finance Club &copy; 2025
+  </footer>
+
+  <script>
+    const CERTS = {
+  "DEOS-IA-S1-001": {
+    "id": "DEOS-IA-S1-001",
+    "name": "Ευάγγελος Ανωγειανάκης",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-002": {
+    "id": "DEOS-IA-S1-002",
+    "name": "Μιχάλης Αξαρλής",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-003": {
+    "id": "DEOS-IA-S1-003",
+    "name": "Μιχάλης Βερβεράκης",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-004": {
+    "id": "DEOS-IA-S1-004",
+    "name": "Νεοκλής Δριστέλλας",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-005": {
+    "id": "DEOS-IA-S1-005",
+    "name": "Κωσταντίνα Κακκαβού",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-006": {
+    "id": "DEOS-IA-S1-006",
+    "name": "Βαγγέλης Κιζανης",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-007": {
+    "id": "DEOS-IA-S1-007",
+    "name": "Μαρία Κομποθανάση",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-008": {
+    "id": "DEOS-IA-S1-008",
+    "name": "Αλέξανδρος Μακρυγιάννης",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-009": {
+    "id": "DEOS-IA-S1-009",
+    "name": "Ανδρέας Μεταξάς",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-010": {
+    "id": "DEOS-IA-S1-010",
+    "name": "Θεοχάρης Μήλος",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-011": {
+    "id": "DEOS-IA-S1-011",
+    "name": "Γιωργος Νταβος",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-012": {
+    "id": "DEOS-IA-S1-012",
+    "name": "Σπυρίδων Παντελής",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-013": {
+    "id": "DEOS-IA-S1-013",
+    "name": "Κωνσταντίνος Παπαδάτος",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-014": {
+    "id": "DEOS-IA-S1-014",
+    "name": "Γεράσιμος Πολίτης",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-015": {
+    "id": "DEOS-IA-S1-015",
+    "name": "Μαρια Σκοτιδη",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-016": {
+    "id": "DEOS-IA-S1-016",
+    "name": "Μελίτα Σταματάκη",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-017": {
+    "id": "DEOS-IA-S1-017",
+    "name": "Κωνσταντίνα Συροπούλου",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-018": {
+    "id": "DEOS-IA-S1-018",
+    "name": "Δήμητρα Τζίνα",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-019": {
+    "id": "DEOS-IA-S1-019",
+    "name": "Βασιλης Τσιμπουκας",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 14, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-020": {
+    "id": "DEOS-IA-S1-020",
+    "name": "Αικατερινη Λιλικα Τυρλη",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 15, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-021": {
+    "id": "DEOS-IA-S1-021",
+    "name": "Μαριος Χαρίτος",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 16, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-022": {
+    "id": "DEOS-IA-S1-022",
+    "name": "Οδυσσέας Χατζηγεωργίου",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 17, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-023": {
+    "id": "DEOS-IA-S1-023",
+    "name": "Νικος Χοντζέας",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 18, 2025",
+    "sessions": 0
+  },
+  "DEOS-IA-S1-024": {
+    "id": "DEOS-IA-S1-024",
+    "name": "Άνθια Χρίστου",
+    "course": "Investing Academy: Season 1",
+    "issued": "May 19, 2025",
+    "sessions": 0
+  }
+};
+
+    function getParam(key) {
+      return new URLSearchParams(window.location.search).get(key);
+    }
+
+    function verify(inputId) {
+      const raw = inputId || document.getElementById('cert-input').value.trim().toUpperCase();
+      if (!raw) return;
+      document.getElementById('cert-input').value = raw;
+      const el = document.getElementById('result');
+      el.style.display = 'block';
+      const cert = CERTS[raw];
+      if (cert) {
+        el.innerHTML = `
+          <div class="result-box valid">
+            <span class="result-icon">&#10003;</span>
+            <div class="result-status valid">Certificate Verified</div>
+            <div class="detail-grid">
+              <div class="detail-row">
+                <span class="detail-label">Certificate holder</span>
+                <span class="detail-value">${cert.name}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Programme</span>
+                <span class="detail-value">${cert.course}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Issue date</span>
+                <span class="detail-value">${cert.issued}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Sessions completed</span>
+                <span class="detail-value">${cert.sessions} / 8</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Certificate ID</span>
+                <span class="detail-value"><span class="cert-id-badge">${cert.id}</span></span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Issued by</span>
+                <span class="detail-value">DEOS Finance Club</span>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        el.innerHTML = `
+          <div class="result-box invalid">
+            <span class="result-icon">&#10007;</span>
+            <div class="result-status invalid">Certificate Not Found</div>
+            <p style="text-align:center;color:#94A3B8;font-size:0.9rem;margin-top:0.5rem;">
+              No record found for <strong style="color:#F472B6">${raw}</strong>.<br/>
+              Please check the ID and try again.
+            </p>
+          </div>`;
+      }
+    }
+
+    // Auto-verify if ?id= param is present in URL
+    window.addEventListener('DOMContentLoaded', () => {
+      const id = getParam('id');
+      if (id) verify(id.toUpperCase());
+    });
+
+    // Allow Enter key to trigger verify
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('cert-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') verify();
+      });
+    });
+  </script>
+</body>
+</html>
