@@ -182,6 +182,21 @@
       color: var(--pink-lt);
     }
 
+    /* ── Certificate image ───────────────────────────────── */
+    .cert-image-wrap {
+      text-align: center;
+      margin-bottom: 1.4rem;
+    }
+    .cert-image-wrap img {
+      max-width: 100%;
+      width: 340px;
+      border-radius: 0.75rem;
+      box-shadow: 0 6px 32px rgba(107,33,168,0.35);
+      border: 1px solid var(--border);
+      display: block;
+      margin: 0 auto;
+    }
+
     /* ── Empty state ─────────────────────────────────────── */
     .hint {
       text-align: center;
@@ -226,7 +241,7 @@
   </main>
 
   <footer>
-    Registry last updated: May 22, 2026 at 23:34 &nbsp;|&nbsp; DEOS Finance Club &copy; 2025
+    Registry last updated: May 23, 2026 at 12:07 &nbsp;|&nbsp; DEOS Finance Club &copy; 2025
   </footer>
 
   <script>
@@ -400,6 +415,7 @@
     "sessions": 0
   }
 };
+    const IMAGES_BASE = "https://deosfinanceclub.github.io/deos-certificates/images";
 
     function getParam(key) {
       return new URLSearchParams(window.location.search).get(key);
@@ -413,10 +429,15 @@
       el.style.display = 'block';
       const cert = CERTS[raw];
       if (cert) {
+        const imgUrl = IMAGES_BASE + '/' + cert.id + '.png';
         el.innerHTML = `
           <div class="result-box valid">
             <span class="result-icon">&#10003;</span>
             <div class="result-status valid">Certificate Verified</div>
+            <div class="cert-image-wrap">
+              <img src="${imgUrl}" alt="Certificate for ${cert.name}"
+                   onerror="this.parentElement.style.display='none'"/>
+            </div>
             <div class="detail-grid">
               <div class="detail-row">
                 <span class="detail-label">Certificate holder</span>
